@@ -110,8 +110,8 @@ class LutrisWindow(Gtk.ApplicationWindow):
             # Check if the PGA contains game IDs that the user does not
             # want to see
             ignores = pga.get_hidden_ids()
-            should_be_hidden = lambda game: not game["id"] in ignores
-            self.game_list = list(filter(should_be_hidden, game_list_raw))
+            should_be_hidden = lambda game: game["id"] in ignores
+            self.game_list = [game for game in game_list_raw if not should_be_hidden(game)]
 
         self.view = self.get_view(view_type)
 
