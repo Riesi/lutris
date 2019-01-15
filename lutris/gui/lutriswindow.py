@@ -299,7 +299,6 @@ class LutrisWindow(Gtk.ApplicationWindow):
 
     def hidden_state_change(self, action, value):
         """Hides or shows the hidden games"""
-        self.show_hidden_games = value
         action.set_state(value)
 
         # Add or remove hidden games
@@ -310,11 +309,11 @@ class LutrisWindow(Gtk.ApplicationWindow):
 
         # If we have to show the hidden games now, we need to add them back to
         # the view. If we need to hide them, we just remove them from the view
-        for game_id in ignores:
-            if self.show_hidden_games:
-                self.view.add_game_by_id(game_id)
-            else:
-                self.view.remove_game(game_id)
+        if value:
+            self.game_store.add_games_by_ids(ignores)
+        else:
+            for game_id in ignores:
+                self.game_store.remove_game(game_id)
 
     @property
     def current_view_type(self):
@@ -360,6 +359,10 @@ class LutrisWindow(Gtk.ApplicationWindow):
     def view_sorting_ascending(self):
         return settings.read_setting("view_sorting_ascending").lower() != "false"
 
+    @property
+    def show_hidden_games(self):
+        return settings.read_setting("show_hidden_games").lower() == "true"
+    
     def get_store(self, games=None):
         """Return an instance of GameStore"""
         games = games or pga.get_games(show_installed_first=self.show_installed_first)
