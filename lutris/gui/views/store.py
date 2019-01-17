@@ -99,15 +99,14 @@ class GameStore(GObject.Object):
         self.games = games or []
         self.search_mode = False
 
-        game_list_raw = pga.get_games(show_installed_first=show_installed_first)
+        games_raw = pga.get_games(show_installed_first=show_installed_first)
         if show_hidden_games:
-            self.games = game_list_raw
+            self.games = games_raw
         else:
             # Check if the PGA contains game IDs that the user does not
             # want to see
             ignores = pga.get_hidden_ids()
-            should_be_hidden = lambda game: game["id"] in ignores
-            self.games = [game for game in game_list_raw if not should_be_hidden(game)]
+            self.games = [game for game in games_raw if game["id"] not in ignores]
 
         self.games_to_refresh = set()
         self.icon_type = icon_type
