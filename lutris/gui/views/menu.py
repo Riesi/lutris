@@ -9,7 +9,6 @@ from lutris.gui.views import COL_ID
 from lutris.util.log import logger
 
 
-
 class ContextualMenu(Gtk.Menu):
     __gsignals__ = {
         "shortcut-edited": (GObject.SIGNAL_RUN_FIRST, None, (str,)),

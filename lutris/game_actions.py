@@ -184,7 +184,7 @@ class GameActions:
             ),
             "browse": self.game.is_installed and self.game.runner_name != "browser",
             "remove": not self.game.is_search_result,
-            "view": True
+            "view": True,
             "hide": not GameActions.is_game_hidden(self.game),
             "unhide": GameActions.is_game_hidden(self.game)
         }

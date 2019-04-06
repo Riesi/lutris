@@ -91,9 +91,6 @@ class LutrisWindow(Gtk.ApplicationWindow):
 
         view_type = self.get_view_type()
         self.load_icon_type_from_settings(view_type)
-        self.show_hidden_games = (
-            settings.read_setting("show_hidden_games", default="true").lower() == "true"
-        )
         
         # Window initialization
         self.game_actions = GameActions(application=application, window=self)
@@ -361,7 +358,7 @@ class LutrisWindow(Gtk.ApplicationWindow):
 
     @property
     def show_hidden_games(self):
-        return settings.read_setting("show_hidden_games").lower() == "true"
+        return settings.read_setting("show_hidden_games", default="true").lower() == "true"
     
     def get_store(self, games=None):
         """Return an instance of GameStore"""
