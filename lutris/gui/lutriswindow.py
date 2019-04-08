@@ -100,15 +100,8 @@ class LutrisWindow(Gtk.ApplicationWindow):
         self.search_mode = "local"
         self.game_store = self.get_store()
 
-        game_list_raw = pga.get_games(show_installed_first=self.show_installed_first)
-        if self.show_hidden_games:
-            self.game_list = game_list_raw
-        else:
-            # Check if the PGA contains game IDs that the user does not
-            # want to see
-            ignores = pga.get_hidden_ids()
-            should_be_hidden = lambda game: game["id"] in ignores
-            self.game_list = [game for game in game_list_raw if not should_be_hidden(game)]
+        # Add a category to consume hidden games (maybe we can think of a better approach)
+        pga.create_hidden_category()
 
         self.view = self.get_view(view_type)
 
@@ -276,41 +269,23 @@ class LutrisWindow(Gtk.ApplicationWindow):
     def on_hide_game(self, _widget):
         """Add a game to the list of hidden games"""
         game = Game(self.view.selected_game)
-
-        # Append the new hidden ID and save it
-        ignores = pga.get_hidden_ids() + [game.id]
-        pga.set_hidden_ids(ignores)
-
-        # Update the GUI
-        if not self.show_hidden_games:
-            self.view.remove_game(game.id)
+        pga.set_hidden_id(game.id)
 
     def on_unhide_game(self, _widget):
         """Removes a game from the list of hidden games"""
         game = Game(self.view.selected_game)
-
-        # Remove the ID to unhide and save it
-        ignores = pga.get_hidden_ids()
-        ignores.remove(game.id)
-        pga.set_hidden_ids(ignores)
+        pga.remove_hidden_id(game.id)
 
     def hidden_state_change(self, action, value):
         """Hides or shows the hidden games"""
         action.set_state(value)
 
-        # Add or remove hidden games
-        ignores = pga.get_hidden_ids()
-        settings.write_setting("show_hidden_games",
-                               str(self.show_hidden_games).lower(),
-                               section="lutris")
+        # save changed setting
+        settings.write_setting("show_hidden_games", value)
 
-        # If we have to show the hidden games now, we need to add them back to
-        # the view. If we need to hide them, we just remove them from the view
-        if value:
-            self.game_store.add_games_by_ids(ignores)
-        else:
-            for game_id in ignores:
-                self.game_store.remove_game(game_id)
+        # We have to keep the filter value up to date and refilter
+        self.game_store.show_hidden_games = value
+        self.game_store.modelfilter.refilter()
 
     @property
     def current_view_type(self):
@@ -369,6 +344,7 @@ class LutrisWindow(Gtk.ApplicationWindow):
             self.filter_installed,
             self.view_sorting,
             self.view_sorting_ascending,
+            self.show_hidden_games,
             self.show_installed_first,
         )
         game_store.connect("sorting-changed", self.on_game_store_sorting_changed)

@@ -99,14 +99,7 @@ class GameStore(GObject.Object):
         self.games = games or []
         self.search_mode = False
 
-        games_raw = pga.get_games(show_installed_first=show_installed_first)
-        if show_hidden_games:
-            self.games = games_raw
-        else:
-            # Check if the PGA contains game IDs that the user does not
-            # want to see
-            ignores = pga.get_hidden_ids()
-            self.games = [game for game in games_raw if game["id"] not in ignores]
+        self.show_hidden_games = show_hidden_games
 
         self.games_to_refresh = set()
         self.icon_type = icon_type
@@ -230,6 +223,12 @@ class GameStore(GObject.Object):
         """Filter function for the game model"""
         if self.search_mode:
             return True
+        if self.show_hidden_games or (self.filter_category and self.filter_category in pga.hidden_category_name()):
+            pass
+        else:
+            identifier = model.get_value(_iter, COL_ID)
+            if (identifier is None) or identifier in pga.get_hidden_ids():
+                return False
         if self.filter_installed:
             installed = model.get_value(_iter, COL_INSTALLED)
             if not installed and not self.search_mode:

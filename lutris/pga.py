@@ -3,6 +3,7 @@
 import os
 import math
 import time
+import sqlite3
 from itertools import chain
 
 from lutris.util.strings import slugify
@@ -447,6 +448,7 @@ def get_categories(select="*"):
 
     return return_categories
 
+
 def get_games_in_categories(category="*"):
     """Get the ids of games in database."""
     query = "select games.id from games " \
@@ -459,6 +461,7 @@ def get_games_in_categories(category="*"):
         return_ids.append(category["id"])
 
     return return_ids
+
 
 def get_categories_in_game(game_id=-1):
     """Get the categories of a game in database."""
@@ -475,6 +478,7 @@ def get_categories_in_game(game_id=-1):
 
     return return_ids
 
+
 def get_games2categories(select="*"):
     """Get the m2m table for Games2Categories in database."""
     query = "select " + select + " from games2categories"
@@ -487,9 +491,11 @@ def get_games2categories(select="*"):
     print(return_categories)
     return return_categories
 
+
 def add_category(category_name=None):
     """Add a category to the PGA database."""
     return sql.db_insert(PGA_DB, "categories", {"category": category_name})
+
 
 def add_game_to_category(game_id=-1, category=None):
     """Add a m2m reference from game2category to the PGA database."""
@@ -499,17 +505,20 @@ def add_game_to_category(game_id=-1, category=None):
     with sql.db_cursor(PGA_DB) as cursor:
         sql.cursor_execute(cursor, query)
 
+
 def delete_category(category):
     """Delete a category from the PGA."""
     sql.db_delete(PGA_DB, "categories", "category", category)
+
 
 def delete_categories_without_games():
     """Deletes category that has no entry in the m2m table."""
     query = "delete from categories where id not in ( " \
             "select categories.id from games2categories " \
-            "where games2categories.categories = categories.id )"
+            "where games2categories.categories = categories.id ) and not category = \"" + hidden_category_name() + "\""
     with sql.db_cursor(PGA_DB) as cursor:
         sql.cursor_execute(cursor, query)
+
 
 def delete_game_by_id_from_category(game_id, category):
     """Delete a game to category entry from the m2m table."""
@@ -520,20 +529,28 @@ def delete_game_by_id_from_category(game_id, category):
         sql.cursor_execute(cursor, query)
 
 
+def hidden_category_name() -> str:
+    return "Hidden-Games"
+
+
+def create_hidden_category():
+    try:
+        add_category(hidden_category_name())
+    except sqlite3.IntegrityError:
+        pass
+
+
 def get_hidden_ids():
     """Return a list of game IDs to be excluded from the library view"""
-    # Load the ignore string and filter out empty strings to prevent issues
-    ignores_raw = settings.read_setting("library_ignores",
-                                        section="lutris",
-                                        default="").split(",")
-    ignores = [ignore for ignore in ignores_raw if not ignore == ""]
+    return get_games_in_categories(category=hidden_category_name())
 
-    # Turn the strings into integers
-    return [int(game_id) for game_id in ignores]
 
-def set_hidden_ids(games):
-    """Writes a list of game IDs that are to be hidden into the config file"""
-    ignores_str = [str(game_id) for game_id in games]
-    settings.write_setting("library_ignores",
-                           ','.join(ignores_str),
-                           section="lutris")
+def set_hidden_id(game_id):
+    """Adds the game to the Hidden-Games category"""
+    add_game_to_category(game_id, category=hidden_category_name())
+
+
+def remove_hidden_id(game_id):
+    """Removes the game from the Hidden-Games category"""
+    delete_game_by_id_from_category(game_id, category=hidden_category_name())
+
