@@ -111,5 +111,6 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
                     pga.add_game_to_category(self.game_id, label)
 
         self.parent.on_game_updated(self.game)
+        self.parent.sidebar_listbox.update()
 
         self.destroy()
