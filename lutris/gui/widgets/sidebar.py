@@ -204,19 +204,19 @@ class SidebarListBox(Gtk.ListBox):
 
     def add_category_entries(self):
         pga.delete_categories_without_games()
-        categories = pga.get_categories()
+        local_category_dict = dict()
         for category in pga.get_categories():
-            if category not in self.sidebar_categories.keys():
+            temp = self.sidebar_categories.get(category, False)
+            if temp:
+                del self.sidebar_categories[category]
+            else:
                 temp = SidebarRow(category, "categories", category, None)
-                self.sidebar_categories[category] = temp
                 self.add(temp)
-        removalbe_categories = []
-        for sidebar_category in self.sidebar_categories.keys():
-            if sidebar_category not in categories:
-                self.remove(self.sidebar_categories[sidebar_category])
-                removalbe_categories.append(sidebar_category)
-        for rem_category in removalbe_categories:
-            del self.sidebar_categories[rem_category]
+            local_category_dict[category] = temp
+        # remove categories from sidebar that don't exist anymore
+        for remove_category in self.sidebar_categories.values():
+            self.remove(remove_category)
+        self.sidebar_categories = local_category_dict
         self.show_all()
 
     def update(self, *args):
