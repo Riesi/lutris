@@ -266,16 +266,6 @@ class LutrisWindow(Gtk.ApplicationWindow):
             if value.accel:
                 app.add_accelerator(value.accel, "win." + name)
 
-    def on_hide_game(self, _widget):
-        """Add a game to the list of hidden games"""
-        game = Game(self.view.selected_game)
-        pga.set_hidden_id(game.id)
-
-    def on_unhide_game(self, _widget):
-        """Removes a game from the list of hidden games"""
-        game = Game(self.view.selected_game)
-        pga.remove_hidden_id(game.id)
-
     def hidden_state_change(self, action, value):
         """Hides or shows the hidden games"""
         action.set_state(value)

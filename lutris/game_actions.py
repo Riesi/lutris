@@ -129,6 +129,7 @@ class GameActions:
         pga.set_hidden_id(self.window.view.selected_game.id)
 
         # Update the GUI
+        self.window.sidebar_listbox.update()
         self.window.game_store.modelfilter.refilter()
 
     def on_unhide_game(self, _widget):
@@ -136,6 +137,7 @@ class GameActions:
         pga.remove_hidden_id(self.window.view.selected_game.id)
 
         # Update the GUI
+        self.window.sidebar_listbox.update()
         self.window.game_store.modelfilter.refilter()
 
     @staticmethod
