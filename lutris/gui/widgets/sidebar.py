@@ -199,7 +199,7 @@ class SidebarListBox(Gtk.ListBox):
             row.set_header(SidebarHeader("Runners"))
         elif before.type == "runner" and row.type == "platform":
             row.set_header(SidebarHeader("Platforms"))
-        elif before.type == "platform" and row.type == "categories":
+        elif before.type != "categories" and row.type == "categories":
             row.set_header(SidebarHeader("Categories"))
 
     def add_category_entries(self):
