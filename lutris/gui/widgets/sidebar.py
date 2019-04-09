@@ -213,6 +213,8 @@ class SidebarListBox(Gtk.ListBox):
         pga.delete_categories_without_games()
         local_category_dict = dict()
         for category in pga.get_categories():
+            if category == pga.hidden_category_name() and len(pga.get_hidden_ids()) == 0:
+                continue
             temp = self.sidebar_categories.get(category, False)
             if temp:
                 del self.sidebar_categories[category]
