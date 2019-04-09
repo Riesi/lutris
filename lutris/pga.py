@@ -52,8 +52,7 @@ DATABASE = {
     ],
     "categories": [
         {"name": "id", "type": "INTEGER", "indexed": True},
-        {"name": "category", "type": "TEXT"},
-        {"name": "category", "type": "UNIQUE"},
+        {"name": "category", "type": "TEXT UNIQUE"},
     ],
     "games2categories": [
         {"name": "games", "type": "INTEGER", "indexed": False},
