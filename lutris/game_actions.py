@@ -130,6 +130,7 @@ class GameActions:
 
         # Update the GUI
         self.window.sidebar_listbox.update()
+        self.window.game_panel.update()
         self.window.game_store.modelfilter.refilter()
 
     def on_unhide_game(self, _widget):
@@ -138,6 +139,7 @@ class GameActions:
 
         # Update the GUI
         self.window.sidebar_listbox.update()
+        self.window.game_panel.update()
         self.window.game_store.modelfilter.refilter()
 
     @staticmethod
@@ -262,18 +264,22 @@ class GameActions:
     def on_create_menu_shortcut(self, *_args):
         """Add the selected game to the system's Games menu."""
         xdgshortcuts.create_launcher(self.game.slug, self.game.id, self.game.name, menu=True)
+        self.window.game_panel.update()
 
     def on_create_desktop_shortcut(self, *_args):
         """Create a desktop launcher for the selected game."""
         xdgshortcuts.create_launcher(self.game.slug, self.game.id, self.game.name, desktop=True)
+        self.window.game_panel.update()
 
     def on_remove_menu_shortcut(self, *_args):
         """Remove an XDG menu shortcut"""
         xdgshortcuts.remove_launcher(self.game.slug, self.game.id, menu=True)
+        self.window.game_panel.update()
 
     def on_remove_desktop_shortcut(self, *_args):
         """Remove a .desktop shortcut"""
         xdgshortcuts.remove_launcher(self.game.slug, self.game.id, desktop=True)
+        self.window.game_panel.update()
 
     def on_view_game(self, _widget):
         """Callback to open a game on lutris.net"""

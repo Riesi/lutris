@@ -159,8 +159,8 @@ class GamePanel(GenericPanel):
         icon_start = 84
         icons_y_offset = 60
         buttons_x_offset = 28
-        extra_button_start = 520  # Y position for runner actions
-        extra_button_index = 0
+        extra_button_offset = 20  # Y position for runner actions
+
         for action_id, button in self.buttons.items():
             position = None
             if action_id in ("play", "stop", "install"):
@@ -179,7 +179,7 @@ class GamePanel(GenericPanel):
                 position = (icon_start + icon_offset * 3 + icon_width * 3,
                             base_height + icons_y_offset)
 
-            current_y = base_height + 150
+            current_y = base_height + 100
             if action_id == "execute-script":
                 position = (buttons_x_offset, current_y)
             if action_id in ("add", "install_more"):
@@ -190,10 +190,12 @@ class GamePanel(GenericPanel):
                 position = (buttons_x_offset, current_y + 120)
             if action_id in ("menu-shortcut", "rm-menu-shortcut"):
                 position = (buttons_x_offset, current_y + 160)
+            if action_id in ("hide", "unhide"):
+                position = (buttons_x_offset, current_y + 200)
 
             if not position:
-                position = (buttons_x_offset, extra_button_start + extra_button_index * 40)
-                extra_button_index += 1
+                position = (buttons_x_offset, (current_y + 240) + extra_button_offset)
+                extra_button_offset += 40
 
             self.put(button, position[0], position[1])
 
@@ -221,3 +223,8 @@ class GamePanel(GenericPanel):
 
     def on_close(self, _widget):
         self.emit("panel-closed")
+
+    def update(self):
+        for child in self.get_children():
+            child.destroy()
+        self.place_content()
