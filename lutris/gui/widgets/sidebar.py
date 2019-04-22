@@ -100,6 +100,12 @@ class SidebarRow(Gtk.ListBoxRow):
         Gtk.ListBoxRow.do_state_flags_changed(self, previous_flags)
 
 
+class SidebarCategory(SidebarRow):
+    def __init__(self, id_, type_, name, icon):
+        super().__init__(id_, type_, name, icon)
+        self.name = name
+
+
 class SidebarHeader(Gtk.Box):
     def __init__(self, name):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -168,6 +174,7 @@ class SidebarListBox(Gtk.ListBox):
             icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU)
             self.add(SidebarRow(platform, "platform", platform, icon))
 
+        self.set_sort_func(self.sort_categories)
         self.set_filter_func(self._filter_func)
         self.set_header_func(self._header_func)
         self.update()
@@ -210,7 +217,7 @@ class SidebarListBox(Gtk.ListBox):
             if temp:
                 del self.sidebar_categories[category]
             else:
-                temp = SidebarRow(category, "categories", category, None)
+                temp = SidebarCategory(category, "categories", category, None)
                 self.add(temp)
             local_category_dict[category] = temp
         # remove categories from sidebar that don't exist anymore
@@ -224,3 +231,9 @@ class SidebarListBox(Gtk.ListBox):
         self.active_platforms = pga.get_used_platforms()
         self.add_category_entries()
         self.invalidate_filter()
+
+    def sort_categories(self, child1, child2):
+        # only sort category entries
+        if isinstance(child1, SidebarCategory) and isinstance(child2, SidebarCategory):
+            return child1.name.lower() > child2.name.lower()
+        return 0

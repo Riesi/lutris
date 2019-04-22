@@ -18,7 +18,12 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
         self.game = game
         self.game_id = game.id
         self.game_categories = pga.get_categories_in_game(self.game_id)
-        self.grid = Gtk.Grid()
+
+        self.flowbox = Gtk.FlowBox()
+        self.flowbox.set_valign(Gtk.Align.START)
+        self.flowbox.set_max_children_per_line(1)
+        self.flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.flowbox.set_sort_func(self.sort_categories)
 
         self.set_default_size(350, 250)
         self.set_border_width(10)
@@ -40,9 +45,9 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
             checkbutton_option = Gtk.CheckButton(category)
             if category in self.game_categories:
                 checkbutton_option.set_active(True)
-            self.grid.attach_next_to(checkbutton_option, None, Gtk.PositionType.BOTTOM, 3, 1)
+            self.flowbox.add(checkbutton_option)
 
-        row.pack_start(self.grid, True, True, 0)
+        row.pack_start(self.flowbox, True, True, 0)
         sw.add_with_viewport(row)
         frame.add(sw)
         return frame
@@ -52,13 +57,13 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
             category_text = category_entry.get_text().strip()
             if category_text != "":
                 category_text = re.sub(' +', ' ', category_text)    # Remove excessive whitespaces
-                for category_checkbox in self.grid.get_children():
-                    if category_checkbox.get_label() == category_text:
+                for category_checkbox in self.flowbox.get_children():
+                    if category_checkbox.get_children()[0].get_label() == category_text:
                         return
                 category_entry.set_text("")
                 checkbutton_option = Gtk.CheckButton(category_text)
                 checkbutton_option.set_active(True)
-                self.grid.attach_next_to(checkbutton_option, None, Gtk.PositionType.TOP, 3, 1)
+                self.flowbox.add(checkbutton_option)
                 pga.add_category(category_text)
                 self.vbox.show_all()
 
@@ -101,7 +106,8 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
         if not self.is_valid():
             return False
 
-        for category_checkbox in self.grid.get_children():
+        for category_checkbox in self.flowbox.get_children():
+            category_checkbox = category_checkbox.get_children()[0]
             label = category_checkbox.get_label()
             if label in self.game_categories:
                 if not category_checkbox.get_active():
@@ -114,3 +120,8 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
         self.parent.sidebar_listbox.update()
 
         self.destroy()
+
+    def sort_categories(self, child1, child2):
+        if len(child1.get_children()) != 0 and len(child2.get_children()) != 0:
+            return child1.get_children()[0].get_label().lower() > child2.get_children()[0].get_label().lower()
+        return 0
