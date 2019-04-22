@@ -237,5 +237,7 @@ class SidebarListBox(Gtk.ListBox):
     def sort_categories(self, child1, child2):
         # only sort category entries
         if isinstance(child1, SidebarCategory) and isinstance(child2, SidebarCategory):
+            if child1.name == pga.hidden_category_name():
+                return 0
             return child1.name.lower() > child2.name.lower()
         return 0

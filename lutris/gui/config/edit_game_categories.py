@@ -123,5 +123,7 @@ class EditGameCategoriesDialog(Dialog, GameDialogCommon):
 
     def sort_categories(self, child1, child2):
         if len(child1.get_children()) != 0 and len(child2.get_children()) != 0:
+            if child1.get_children()[0].get_label() == pga.hidden_category_name():
+                return 0
             return child1.get_children()[0].get_label().lower() > child2.get_children()[0].get_label().lower()
         return 0
