@@ -90,4 +90,4 @@ class LogTextView(Gtk.TextView):
     def highlight(self, range_start, range_end):
         self.props.buffer.select_range(range_start, range_end)
         # Focus
-        self.scroll_mark_onscreen(self.mark)
+        self.scroll_to_mark(self.mark, within_margin=0.4, use_align=True, xalign=0, yalign=0.5)

@@ -25,6 +25,8 @@ BANNER_PATH = os.path.join(DATA_DIR, "banners")
 COVERART_PATH = os.path.join(DATA_DIR, "coverart")
 ICON_PATH = os.path.join(GLib.get_user_data_dir(), "icons", "hicolor", "128x128", "apps")
 
+LOG_PATH = os.path.join(DATA_DIR, "logs")
+
 sio = SettingsIO(CONFIG_FILE)
 PGA_DB = sio.read_setting("pga_path") or os.path.join(DATA_DIR, "pga.db")
 SITE_URL = sio.read_setting("website") or "https://lutris.net"

@@ -211,7 +211,7 @@ class GameActions:
     def on_show_logs(self, _widget):
         """Display game log"""
         return LogWindow(
-            title="Log for {}".format(self.game),
+            title=self.game.name,
             buffer=self.game.log_buffer,
             application=self.application
         )
